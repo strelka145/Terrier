@@ -14,10 +14,10 @@ function selectColumnType(element) {
   if (element.value.startsWith("# ")) {
     element.setAttribute('name', 'H1');
     text = element.value.substr(2);
-  } else if (element.value = "#t") {
+  } else if (element.value == "#t") {
     element.setAttribute('name', 'TABLE');
     text = "";
-  } else if (element.value = "") {
+  } else if (element.value == "") {
     element.remove();
   }else {
     element.setAttribute('name', 'P');
