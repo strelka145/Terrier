@@ -1,0 +1,9 @@
+*[name="H1"] {
+    font-size: 48px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+*[name="P"] {
+    font-size: 1.5em;
+}
