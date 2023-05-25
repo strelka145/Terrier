@@ -17,7 +17,9 @@ function selectColumnType(element) {
   } else if (element.value = "#t") {
     element.setAttribute('name', 'TABLE');
     text = "";
-  } else {
+  } else if (element.value = "") {
+    element.remove();
+  }else {
     element.setAttribute('name', 'P');
     text = element.value;
   }
