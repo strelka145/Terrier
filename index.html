@@ -4,15 +4,21 @@
 <head>
     <script src="./resources/jspreadsheet/jexcel.js"></script>
     <script src="./resources/jspreadsheet/jsuites.js"></script>
+    <script src="./resources/layout/layout.js"></script>
     <link rel="stylesheet" href="./resources/jspreadsheet/jsuites.css" type="text/css" />
     <link rel="stylesheet" href="./resources/jspreadsheet/jexcel.css" type="text/css" />
     <style>
+        html {
+            height: 100%;
+        }
+
         table {
             width: 100% !important;
         }
 
         body {
-            background-color: #F2EFEE;
+            height: 100%;
+            margin: 0;
         }
 
         h1,
@@ -24,11 +30,6 @@
             color: #303030;
         }
 
-        td {
-          word-break:break-word !important;
-        }
-
-
         textarea {
             width: 100%;
             height: 100%;
@@ -36,15 +37,45 @@
             resize: none;
             outline: none;
         }
+
+        #container {
+            display: flex;
+            height: 100%;
+        }
+
+        #left {
+            background-color: lightblue;
+            flex-grow: 1;
+            overflow: auto;
+        }
+
+        #right {
+            background-color: #F2EFEE;
+            flex-grow: 1;
+            overflow: auto;
+        }
+
+        #dragbar {
+            width: 5px;
+            background-color: gray;
+            cursor: col-resize;
+        }
     </style>
     <link rel="stylesheet" href="./resources/style.css">
     <script src="./resources/app.js"></script>
 </head>
 
 <body>
-    <h1 ondblclick="convertToTextarea(this)" oncontextmenu="addElement(this)" name="H1">Title</h1>
-    <p ondblclick="convertToTextarea(this)" oncontextmenu="addElement(this)" name="P">text</p>
-    </script>
+    <div id="container">
+        <div id="left">Left content</div>
+        <div id="dragbar"></div>
+        <div id="right">
+            <h1 ondblclick="convertToTextarea(this)" oncontextmenu="showContextMenu(this)"
+                id="idhYY0G3XIMwrTL_y9tOIGIQExETKIf-_EJSkwZy4o" name="H1">Title</h1>
+            <p ondblclick="convertToTextarea(this)" oncontextmenu="showContextMenu(this)"
+                id="idfz9rQnGsjR0eC4vsoihq2bjyAt9PEtszh4Pv2uD3" name="P">text</p>
+        </div>
+    </div>
 </body>
 
 </html>

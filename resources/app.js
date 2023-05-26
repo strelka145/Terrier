@@ -1,7 +1,24 @@
-function addElement(element) {
+const {
+  ipcRenderer
+} = require('electron');
+
+function showContextMenu(element) {
+  ipcRenderer.send('show-context-menu', element.id);
+}
+
+function addElementForward(element) {
   let new_element = document.createElement('textarea');
-  new_element.setAttribute('name', 'P');
-  new_element.value = "text"
+  new_element.value = "text";
+  new_element.addEventListener("blur", function(event) {
+    selectColumnType(element = event.target);
+  });
+  element.before(new_element);
+  element.focus();
+}
+
+function addElementBehind(element) {
+  let new_element = document.createElement('textarea');
+  new_element.value = "text";
   new_element.addEventListener("blur", function(event) {
     selectColumnType(element = event.target);
   });
@@ -19,7 +36,8 @@ function selectColumnType(element) {
     text = "";
   } else if (element.value == "") {
     element.remove();
-  }else {
+    return 0;
+  } else {
     element.setAttribute('name', 'P');
     text = element.value;
   }
@@ -59,20 +77,19 @@ function convertToText(element, value) {
     newTextElement = document.createElement("h1");
     newTextElement.textContent = text;
     newTextElement.setAttribute('ondblclick', "convertToTextarea(this)");
-    newTextElement.setAttribute('oncontextmenu', "addElement(this)");
+    newTextElement.setAttribute('oncontextmenu', "showContextMenu(this)");
     newTextElement.setAttribute('name', element.name);
     parent.replaceChild(newTextElement, element);
   } else if (element.name === "P") {
     newTextElement = document.createElement("p");
     newTextElement.textContent = text;
     newTextElement.setAttribute('ondblclick', "convertToTextarea(this)");
-    newTextElement.setAttribute('oncontextmenu', "addElement(this)");
+    newTextElement.setAttribute('oncontextmenu', "showContextMenu(this)");
     newTextElement.setAttribute('name', element.name);
     parent.replaceChild(newTextElement, element);
   } else if (element.name === "TABLE") {
     newTextElement = document.createElement("div");
     newTextElement.setAttribute('name', element.name);
-    newTextElement.setAttribute('id', getid);
     parent.replaceChild(newTextElement, element);
     var data = [['', '', ''], ['', '', '']];
     jspreadsheet(document.getElementById(getid), {
@@ -84,7 +101,12 @@ function convertToText(element, value) {
       ]
     });
   }
-
-
-
+  newTextElement.setAttribute('id', getid);
 }
+
+ipcRenderer.on('addForward', (event, elementID) => {
+  addElementForward(document.getElementById(elementID));
+});
+ipcRenderer.on('addBehind', (event, elementID) => {
+  addElementBehind(document.getElementById(elementID));
+});
