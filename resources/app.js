@@ -1,3 +1,67 @@
+function convertMarkdownToList(markdownText) {
+  const lines = markdownText.split('\n');
+  let html = '';
+  let currentIndentation = 0;
+  let currentIndex = 0;
+  var isNumFstList=false;
+
+  function processNestedList(indentation) {
+    let nestedHtml = '';
+    var isNumList=false;
+    var reg = new RegExp("^\t{"+indentation+"}[0-9]+\. (?=.+)");
+    var reg1 = new RegExp("^\t{"+(indentation+1)+"}[0-9]+\. (?=.+)");
+    while (currentIndex < lines.length) {
+      const line = lines[currentIndex];
+      if (line.startsWith('\t'.repeat(indentation) + '- ')) {
+        const listItem = line.substring(indentation + 2).trim();
+        nestedHtml += `<li>${listItem}</li>`;
+        currentIndex++;
+      } else if (line.startsWith('\t'.repeat(indentation + 1) + '- ')||line.match(reg1)) {
+        nestedHtml += processNestedList(indentation + 1);
+      } else if(line.match(reg)){
+        isNumList=true;
+        const listItem = line.substring(line.match(reg)[0].length).trim();
+        nestedHtml += `<li>${listItem}</li>`;
+        currentIndex++;
+      }else {
+        break;
+      }
+    }
+
+    if (isNumList){
+      return `<ol>${nestedHtml}</ol>`;
+    }else{
+      return `<ul>${nestedHtml}</ul>`;
+    }
+  }
+  while (currentIndex < lines.length) {
+    const line = lines[currentIndex];
+
+    if (line.startsWith('- ')) {
+      const listItem = line.substring(2).trim();
+      html += `<li>${listItem}</li>`;
+      currentIndex++;
+    }else if(line.match(/^[0-9]+\. (?=.+)/)){
+      isNumFstList=true;
+      const listItem = line.substring(line.match(/^[0-9]+\. (?=.+)/)[0].length).trim();
+      html += `<li>${listItem}</li>`;
+      currentIndex++;
+    } else if (line.startsWith('\t- ')||line.match(/^\t[0-9]+\. (?=.+)/)) {
+      html += processNestedList(1);
+    } else {
+      currentIndex++;
+    }
+  }
+
+  if (isNumFstList){
+    html = `<ol>${html}</ol>`;
+  }else{
+    html = `<ul>${html}</ul>`;
+  }
+  
+  return html;
+}
+
 function showContextMenu(element) {
   window.api.showContextMenu(element.id);
 }
