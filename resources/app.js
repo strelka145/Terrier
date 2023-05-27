@@ -1,9 +1,5 @@
-const {
-  ipcRenderer
-} = require('electron');
-
 function showContextMenu(element) {
-  ipcRenderer.send('show-context-menu', element.id);
+  window.api.showContextMenu(element.id);
 }
 
 function addElementForward(element) {
@@ -79,6 +75,7 @@ function convertToText(element, value) {
     newTextElement.setAttribute('ondblclick', "convertToTextarea(this)");
     newTextElement.setAttribute('oncontextmenu', "showContextMenu(this)");
     newTextElement.setAttribute('name', element.name);
+    newTextElement.setAttribute('id', getid);
     parent.replaceChild(newTextElement, element);
   } else if (element.name === "P") {
     newTextElement = document.createElement("p");
@@ -86,10 +83,12 @@ function convertToText(element, value) {
     newTextElement.setAttribute('ondblclick', "convertToTextarea(this)");
     newTextElement.setAttribute('oncontextmenu', "showContextMenu(this)");
     newTextElement.setAttribute('name', element.name);
+    newTextElement.setAttribute('id', getid);
     parent.replaceChild(newTextElement, element);
   } else if (element.name === "TABLE") {
     newTextElement = document.createElement("div");
     newTextElement.setAttribute('name', element.name);
+    newTextElement.setAttribute('id', getid);
     parent.replaceChild(newTextElement, element);
     var data = [['', '', ''], ['', '', '']];
     jspreadsheet(document.getElementById(getid), {
@@ -101,12 +100,13 @@ function convertToText(element, value) {
       ]
     });
   }
-  newTextElement.setAttribute('id', getid);
+  
 }
 
-ipcRenderer.on('addForward', (event, elementID) => {
+window.api.on('addForward', (event, elementID)=>{
   addElementForward(document.getElementById(elementID));
 });
-ipcRenderer.on('addBehind', (event, elementID) => {
+
+window.api.on('addBehind', (event, elementID)=>{
   addElementBehind(document.getElementById(elementID));
 });

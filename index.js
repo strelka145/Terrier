@@ -1,4 +1,6 @@
 const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+const path = require('path');
+
 let mainWindow;
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -6,8 +8,8 @@ const createWindow = () => {
     height: 400,
     title: 'Terrier',
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 
@@ -20,7 +22,7 @@ app.once('ready', () => {
 
 app.once('window-all-closed', () => app.quit());
 
-ipcMain.on('show-context-menu', (event, elementID) => {
+ipcMain.handle('show-context-menu', async (e, elementID) => {
   const menu = Menu.buildFromTemplate([{
     label: 'Add an element forward',
     click: () => {
