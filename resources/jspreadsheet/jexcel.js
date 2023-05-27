@@ -5884,7 +5884,7 @@ var formula = (function() {
   return F;
 })();
 
-if (!jSuites && typeof (require) != 'function') {
+if (!jSuites && typeof (require) === 'function') {
   var jSuites = require('jsuites');
 }
 
