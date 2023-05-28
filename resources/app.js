@@ -16,6 +16,10 @@ function convertMarkdownToList(markdownText) {
         const listItem = line.substring(indentation + 2).trim();
         var liElement=document.createElement('li');
         liElement.textContent=listItem;
+        liElement.setAttribute('ondblclick', "convertToTextarea(this)");
+        liElement.setAttribute('oncontextmenu', "showContextMenu(this)");
+        liElement.setAttribute('name', 'P');
+        liElement.setAttribute('id', getRandomID());
         nestedHtml.push(liElement);
         currentIndex++;
       } else if (line.startsWith('\t'.repeat(indentation + 1) + '- ')||line.match(reg1)) {
@@ -25,6 +29,10 @@ function convertMarkdownToList(markdownText) {
         const listItem = line.substring(line.match(reg)[0].length).trim();
         var liElement=document.createElement('li');
         liElement.textContent=listItem;
+        liElement.setAttribute('ondblclick', "convertToTextarea(this)");
+        liElement.setAttribute('oncontextmenu', "showContextMenu(this)");
+        liElement.setAttribute('name', 'P');
+        liElement.setAttribute('id', getRandomID());
         nestedHtml.push(liElement);
         currentIndex++;
       }else {
@@ -53,6 +61,10 @@ function convertMarkdownToList(markdownText) {
       const listItem = line.substring(2).trim();
       var liElement=document.createElement('li');
       liElement.textContent=listItem;
+      liElement.setAttribute('ondblclick', "convertToTextarea(this)");
+      liElement.setAttribute('oncontextmenu', "showContextMenu(this)");
+      liElement.setAttribute('name', 'P');
+      liElement.setAttribute('id', getRandomID());
       html.push(liElement);
       currentIndex++;
     }else if(line.match(/^[0-9]+\. (?=.+)/)){
@@ -60,6 +72,10 @@ function convertMarkdownToList(markdownText) {
       const listItem = line.substring(line.match(/^[0-9]+\. (?=.+)/)[0].length).trim();
       var liElement=document.createElement('li');
       liElement.textContent=listItem;
+      liElement.setAttribute('ondblclick', "convertToTextarea(this)");
+      liElement.setAttribute('oncontextmenu', "showContextMenu(this)");
+      liElement.setAttribute('name', 'P');
+      liElement.setAttribute('id', getRandomID());
       html.push(liElement);
       currentIndex++;
     } else if (line.startsWith('\t- ')||line.match(/^\t[0-9]+\. (?=.+)/)) {
