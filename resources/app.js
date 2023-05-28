@@ -69,6 +69,7 @@ function showContextMenu(element) {
 function addElementForward(element) {
   let new_element = document.createElement('textarea');
   new_element.value = "text";
+  new_element.onkeydown = function( e ){ OnTabKey( e, this ); }
   new_element.addEventListener("blur", function(event) {
     selectColumnType(element = event.target);
   });
@@ -79,11 +80,24 @@ function addElementForward(element) {
 function addElementBehind(element) {
   let new_element = document.createElement('textarea');
   new_element.value = "text";
+  new_element.onkeydown = function( e ){ OnTabKey( e, this ); }
   new_element.addEventListener("blur", function(event) {
     selectColumnType(element = event.target);
   });
   element.after(new_element);
   element.focus();
+}
+
+function OnTabKey( e, obj ){
+  if( e.keyCode!=9 ){ return; }
+  e.preventDefault();
+
+  var cursorPosition = obj.selectionStart;
+  var cursorLeft     = obj.value.substr( 0, cursorPosition );
+  var cursorRight    = obj.value.substr( cursorPosition, obj.value.length );
+
+  obj.value = cursorLeft+"\t"+cursorRight;
+  obj.selectionEnd = cursorPosition+1;
 }
 
 function selectColumnType(element) {
@@ -94,7 +108,10 @@ function selectColumnType(element) {
   } else if (element.value == "#t") {
     element.setAttribute('name', 'TABLE');
     text = "";
-  } else if (element.value == "") {
+  } else if(element.value.startsWith("- ")||element.value.startsWith("1. ")){
+    element.setAttribute('name', 'LIST');
+    text = element.value;
+  }else if (element.value == "") {
     element.remove();
     return 0;
   } else {
@@ -108,6 +125,7 @@ function convertToTextarea(element) {
   var text = element.textContent.trim();
 
   var textarea = document.createElement("textarea");
+  textarea.onkeydown = function( e ){ OnTabKey( e, this ); }
   textarea.setAttribute('name', element.tagName);
   textarea.value = text;
   textarea.addEventListener("blur", function(event) {
@@ -122,6 +140,12 @@ function getRandomID() {
   idBase64 = "id" + btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(40)))).substring(0, 40);
   idHtml = idBase64.replace(/=/g, '.').replace(/\//g, '_').replace(/\+/g, '-');
   return idHtml;
+}
+
+function createElementsFromHTML(htmlString) {
+  const tempContainer = document.createElement('div');
+  tempContainer.innerHTML = htmlString;
+  return tempContainer.children;
 }
 
 function convertToText(element, value) {
@@ -163,6 +187,11 @@ function convertToText(element, value) {
         { type: 'text' }
       ]
     });
+  } else if (element.name === "LIST"){
+    newTextElement = createElementsFromHTML(convertMarkdownToList(text))[0];
+    newTextElement.setAttribute('name', element.name);
+    newTextElement.setAttribute('id', getid);
+    parent.replaceChild(newTextElement, element);
   }
   
 }
