@@ -81,7 +81,6 @@ function convertMarkdownToList(markdownText) {
       retElem.appendChild(elem);
     }
     return retElem;
-    html = `<ul>${html}</ul>`;
   }
 }
 
