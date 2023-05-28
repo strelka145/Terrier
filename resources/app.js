@@ -1,12 +1,12 @@
 function convertMarkdownToList(markdownText) {
   const lines = markdownText.split('\n');
-  let html = '';
+  let html = [];
   let currentIndentation = 0;
   let currentIndex = 0;
   var isNumFstList=false;
 
   function processNestedList(indentation) {
-    let nestedHtml = '';
+    let nestedHtml = [];
     var isNumList=false;
     var reg = new RegExp("^\t{"+indentation+"}[0-9]+\. (?=.+)");
     var reg1 = new RegExp("^\t{"+(indentation+1)+"}[0-9]+\. (?=.+)");
@@ -14,14 +14,18 @@ function convertMarkdownToList(markdownText) {
       const line = lines[currentIndex];
       if (line.startsWith('\t'.repeat(indentation) + '- ')) {
         const listItem = line.substring(indentation + 2).trim();
-        nestedHtml += `<li>${listItem}</li>`;
+        var liElement=document.createElement('li');
+        liElement.textContent=listItem;
+        nestedHtml.push(liElement);
         currentIndex++;
       } else if (line.startsWith('\t'.repeat(indentation + 1) + '- ')||line.match(reg1)) {
-        nestedHtml += processNestedList(indentation + 1);
+        nestedHtml.push(processNestedList(indentation + 1));
       } else if(line.match(reg)){
         isNumList=true;
         const listItem = line.substring(line.match(reg)[0].length).trim();
-        nestedHtml += `<li>${listItem}</li>`;
+        var liElement=document.createElement('li');
+        liElement.textContent=listItem;
+        nestedHtml.push(liElement);
         currentIndex++;
       }else {
         break;
@@ -29,9 +33,17 @@ function convertMarkdownToList(markdownText) {
     }
 
     if (isNumList){
-      return `<ol>${nestedHtml}</ol>`;
+      var retElem=document.createElement('ol');
+      for (const elem of nestedHtml){
+        retElem.appendChild(elem);
+      }
+      return retElem;
     }else{
-      return `<ul>${nestedHtml}</ul>`;
+      var retElem=document.createElement('ul');
+      for (const elem of nestedHtml){
+        retElem.appendChild(elem);
+      }
+      return retElem;
     }
   }
   while (currentIndex < lines.length) {
@@ -39,27 +51,38 @@ function convertMarkdownToList(markdownText) {
 
     if (line.startsWith('- ')) {
       const listItem = line.substring(2).trim();
-      html += `<li>${listItem}</li>`;
+      var liElement=document.createElement('li');
+      liElement.textContent=listItem;
+      html.push(liElement);
       currentIndex++;
     }else if(line.match(/^[0-9]+\. (?=.+)/)){
       isNumFstList=true;
       const listItem = line.substring(line.match(/^[0-9]+\. (?=.+)/)[0].length).trim();
-      html += `<li>${listItem}</li>`;
+      var liElement=document.createElement('li');
+      liElement.textContent=listItem;
+      html.push(liElement);
       currentIndex++;
     } else if (line.startsWith('\t- ')||line.match(/^\t[0-9]+\. (?=.+)/)) {
-      html += processNestedList(1);
+      html.push(processNestedList(1));
     } else {
       currentIndex++;
     }
   }
 
   if (isNumFstList){
-    html = `<ol>${html}</ol>`;
+    var retElem=document.createElement('ol');
+    for (const elem of html){
+      retElem.appendChild(elem);
+    }
+    return retElem;
   }else{
+    var retElem=document.createElement('ul');
+    for (const elem of html){
+      retElem.appendChild(elem);
+    }
+    return retElem;
     html = `<ul>${html}</ul>`;
   }
-  
-  return html;
 }
 
 function showContextMenu(element) {
@@ -148,6 +171,13 @@ function createElementsFromHTML(htmlString) {
   return tempContainer.children;
 }
 
+function htmlSpecialChars(unsafeText){
+  var text = document.createTextNode(unsafeText);
+  var p = document.createElement('p');
+  p.appendChild(text);
+  return p.innerHTML;
+}
+
 function convertToText(element, value) {
   var text = value.trim();
   if (element.name === "H1" || element.name === "P") {
@@ -188,7 +218,7 @@ function convertToText(element, value) {
       ]
     });
   } else if (element.name === "LIST"){
-    newTextElement = createElementsFromHTML(convertMarkdownToList(text))[0];
+    newTextElement = convertMarkdownToList(text);
     newTextElement.setAttribute('name', element.name);
     newTextElement.setAttribute('id', getid);
     parent.replaceChild(newTextElement, element);
